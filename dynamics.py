@@ -13,7 +13,7 @@ from constants import *
 	
 
 def control(x,dx,a,da):
-	K = np.array([316., 7629., 1.70e6, 9.62e6])
+	K = np.array([3162., 4.68e4, 3.24e6, 1.33e7])
 	z = np.array([x,dx,a,da])
 	du = - K.dot(z)
 	return lim(U0, du)
@@ -22,9 +22,9 @@ def control(x,dx,a,da):
 def run(T=1):
 	t = 0
 
-	x, dx = np.random.uniform(-100., 100.), np.random.uniform(-50., 50.) 
-	y, dy = Y0, -V0
-	a, da = np.random.uniform(-0.1, 0.1), 0.
+	x, dx = np.random.uniform(-5., 5.), np.random.uniform(-1., 1.) 
+	y, dy = Y0+L, -V0
+	a, da = np.arctan2(dy,dx)+np.pi/2, 0.
 
 	print "initial x:%.0f, y:%.0f, a:%.2f" %(x,y,a)
 	print "engine thrust: %.1f kN" % (U0/1000.)
@@ -34,16 +34,18 @@ def run(T=1):
 	while t < T:
 		du = control(x,dx,a,da)
 		x,dx,y,dy,a,da = dynamics(x,dx,y,dy,a,da,du,U0,TAU) 
+		print "\nt:",t, "\txy:",x,y
+		print "dy:", dy
 		log.append((t,x,y,a,du))
 		t += TAU
-		if y < L:
+		if y < L or dy > 0:
 			break
 	check_landing(x,dx,y,dy,a,da)
 	show(log)
 	
 
 def show(log):
-	N = int(len(log)/6)
+	N = int(len(log)/2)
 	[Ti, X,Y,A,U] = zip(*log[-N:])
 	plt.figure(1)
 	plt.title('simulation results')
@@ -67,9 +69,9 @@ def show(log):
 
 
 def check_landing(x,dx,y,dy,a,da):
-	if abs(dy) > 1.: print "LANDING FAILED"
+	if abs(dy) > 0.5: print "LANDING FAILED"
 	if abs(da) > 0.05: print "LANDING FAILED"
-	if abs(dx) > 0.05: print "LANDING FAILED"
+	if abs(dx) > 0.1: print "LANDING FAILED"
 	print "final x:%.0f, y:%.0f, a:%.2f" %(x,y,a)
 	print "final velocity: %.1f" % np.sqrt(dx**2 + dy**2)
 	

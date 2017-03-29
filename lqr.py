@@ -22,8 +22,8 @@ if __name__ == '__main__':
     W = 1.5
     L = 35.
     m = 100000.
-    v0 = 500.
-    y0 = 10000.
+    v0 = 2.
+    y0 = 200.
     G = 9.81
     C = 3*W/m/(L**2)
 
@@ -38,8 +38,8 @@ if __name__ == '__main__':
                   [0.],
                   [C]])
     
-    Q = np.eye(4) * np.array([1/100., 1., 10., 10.])
-    R = np.eye(1) * 1.e-7
+    Q = np.eye(4) * np.array([1/10., 1., 10., 10.])
+    R = np.eye(1) * 1.e-8
 
     K, eigenvals = lqr(A,B,Q,R)
     print "K:",K,"\neigen vals:",eigenvals
