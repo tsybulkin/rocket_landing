@@ -9,11 +9,12 @@ from matplotlib import pyplot as plt
 import numpy as np
 import sys
 from constants import *
+from animation import show_animation
 
 	
 
 def control(x,dx,a,da):
-	K = np.array([3162., 4.68e4, 3.24e6, 1.33e7])
+	K = np.array([-3.16e3, -5.90e4, 3.99e6, 1.47e7])
 	z = np.array([x,dx,a,da])
 	du = - K.dot(z)
 	return lim(U0, du)
@@ -22,25 +23,35 @@ def control(x,dx,a,da):
 def run(T=1):
 	t = 0
 
-	x, dx = np.random.uniform(-5., 5.), np.random.uniform(-1., 1.) 
+	x, dx = np.random.uniform(-15., 15.), np.random.uniform(-2., 2.) 
 	y, dy = Y0+L, -V0
-	a, da = np.arctan2(dy,dx)+np.pi/2, 0.
+	a, da = -(np.arctan2(dy,dx)+np.pi/2), 0.
 
 	print "initial x:%.0f, y:%.0f, a:%.2f" %(x,y,a)
 	print "engine thrust: %.1f kN" % (U0/1000.)
 
 	log = []
-	
+	engines_off = False
+
 	while t < T:
-		du = control(x,dx,a,da)
-		x,dx,y,dy,a,da = dynamics(x,dx,y,dy,a,da,du,U0,TAU) 
-		print "\nt:",t, "\txy:",x,y
-		print "dy:", dy
+		if dy > -0.02:
+			engines_off = True
+
+		if engines_off:
+			du = 0
+			x,dx,y,dy,a,da = dynamics(x,dx,y,dy,a,da,du,m*G,TAU)
+		else:
+			du = control(x,dx,a,da)
+			x,dx,y,dy,a,da = dynamics(x,dx,y,dy,a,da,du,U0,TAU) 
+
+		#print "\nt:",t, "\txy:",x,y
+		#print "dy:", dy
 		log.append((t,x,y,a,du))
 		t += TAU
-		if y < L or dy > 0:
+		if y < L:
 			break
 	check_landing(x,dx,y,dy,a,da)
+	show_animation(log)
 	show(log)
 	
 
@@ -69,11 +80,12 @@ def show(log):
 
 
 def check_landing(x,dx,y,dy,a,da):
-	if abs(dy) > 0.5: print "LANDING FAILED"
+	if abs(dy) > 0.3: print "LANDING FAILED"
 	if abs(da) > 0.05: print "LANDING FAILED"
 	if abs(dx) > 0.1: print "LANDING FAILED"
 	print "final x:%.0f, y:%.0f, a:%.2f" %(x,y,a)
-	print "final velocity: %.1f" % np.sqrt(dx**2 + dy**2)
+	print "final velocity: %.2f" % np.sqrt(dx**2 + dy**2)
+	print "final angle: %.2f,   angular velosity: %.2f" %(a,da) 
 	
 
 def lim(LIM, val):
@@ -83,7 +95,7 @@ def lim(LIM, val):
 
 
 def dynamics(x,dx,y,dy,a,da,du,U,tau):
-	dx += U/m * a * tau
+	dx += -U/m * a * tau
 	x += dx * tau
 
 	dy += (U/m - G) * tau
