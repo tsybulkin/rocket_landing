@@ -11,13 +11,12 @@ import sys
 from constants import *
 from animation import show_animation
 
-	
 
 def control(x,dx,a,da):
-	K = np.array([-3.16e3, -5.90e4, 3.99e6, 1.47e7])
+	K = np.array([-1.0e4, -1.60e5, 7.79e6, 2.06e7])
 	z = np.array([x,dx,a,da])
 	du = - K.dot(z)
-	return lim(U0, du)
+	return lim(U0/2, du)
 
 
 def run(T=1):
@@ -26,7 +25,7 @@ def run(T=1):
 	x, dx = np.random.uniform(-15., 15.), np.random.uniform(-2., 2.) 
 	y, dy = Y0+L, -V0
 	a, da = -(np.arctan2(dy,dx)+np.pi/2), 0.
-
+	
 	print "initial x:%.0f, y:%.0f, a:%.2f" %(x,y,a)
 	print "engine thrust: %.1f kN" % (U0/1000.)
 

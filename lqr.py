@@ -35,7 +35,7 @@ if __name__ == '__main__':
                   [C]])
     
     Q = np.eye(4) * np.array([1/10., 10., 10., 10.])
-    R = np.eye(1) * 1.e-8
+    R = np.eye(1) * 1.e-9
 
     K, eigenvals = lqr(A,B,Q,R)
     print "K:",K,"\neigen vals:",eigenvals
