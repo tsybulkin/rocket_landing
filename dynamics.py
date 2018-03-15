@@ -16,13 +16,13 @@ def control(x,dx,a,da):
 	K = np.array([-1.0e4, -1.60e5, 7.79e6, 2.06e7])
 	z = np.array([x,dx,a,da])
 	du = - K.dot(z)
-	return lim(U0/2, du)
+	return lim(U0, du)
 
 
 def run(T=1):
 	t = 0
 
-	x, dx = np.random.uniform(-15., 15.), np.random.uniform(-2., 2.) 
+	x, dx = np.random.uniform(-25., 25.), np.random.uniform(-1., 1.) 
 	y, dy = Y0+L, -V0
 	a, da = -(np.arctan2(dy,dx)+np.pi/2), 0.
 	
@@ -79,9 +79,10 @@ def show(log):
 
 
 def check_landing(x,dx,y,dy,a,da):
-	if abs(dy) > 0.3: print "LANDING FAILED"
+	if abs(dy) > 0.5: print "LANDING FAILED"
 	if abs(da) > 0.05: print "LANDING FAILED"
-	if abs(dx) > 0.1: print "LANDING FAILED"
+	if abs(a) > 0.05: print "LANDING FAILED"
+	if abs(dx) > 0.5: print "LANDING FAILED"
 	print "final x:%.0f, y:%.0f, a:%.2f" %(x,y,a)
 	print "final velocity: %.2f" % np.sqrt(dx**2 + dy**2)
 	print "final angle: %.2f,   angular velosity: %.2f" %(a,da) 
